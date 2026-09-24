@@ -68,6 +68,18 @@ $initials = strtoupper(substr($fullname, 0, 1));
                 <i class="bi bi-pin-map me-3"></i> <span>Koordinator Gang</span>
             </a>
 
+            <div class="menu-item <?= in_array($current_page, ['aset.php', 'peminjaman.php', 'pemakaian.php']) ? 'active' : ''; ?>">
+                <a class="nav-link d-flex justify-content-between align-items-center" onclick="toggleSubMenu(this)">
+                    <span><i class="bi bi-box-seam me-3"></i> Aset & Inventaris</span>
+                    <i class="bi bi-chevron-down arrow small"></i>
+                </a>
+                <div class="submenu">
+                    <a href="../aset/aset.php" class="<?= ($current_page == 'aset.php') ? 'active-submenu' : ''; ?>">Data Barang</a>
+                    <a href="../aset/peminjaman.php" class="<?= ($current_page == 'peminjaman.php') ? 'active-submenu' : ''; ?>">Peminjaman</a>
+                    <a href="../aset/pemakaian.php" class="<?= ($current_page == 'pemakaian.php') ? 'active-submenu' : ''; ?>">Pemakaian</a>
+                </div>
+            </div>
+
             <div class="menu-header px-4 small text-muted text-uppercase mt-4 mb-2" style="font-size: 10px; letter-spacing: 1px;">Analisis & Laporan</div>
             
             <a href="../dashboard/grafik.php" class="nav-link <?= ($current_page == 'grafik.php') ? 'active' : ''; ?>">

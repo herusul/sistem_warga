@@ -19,6 +19,10 @@ $start = ($page - 1) * $limit;
 $q_nama = isset($_GET['q_nama']) ? trim($_GET['q_nama']) : '';
 $q_rumah = isset($_GET['q_rumah']) ? trim($_GET['q_rumah']) : '';
 $q_gang = isset($_GET['gang']) ? trim($_GET['gang']) : '';
+$q_status = isset($_GET['status']) ? trim($_GET['status']) : '';
+
+// Default kosong: data baru muncul setelah klik Cari (minimal satu filter terisi)
+$has_filter = ($q_nama !== '' || $q_rumah !== '' || $q_gang !== '' || $q_status !== '');
 
 // Bangun klausul WHERE
 $where = " AND a.is_delete IS NULL ";
@@ -49,17 +53,35 @@ if ($q_gang !== '') {
     $types .= "ss";
 }
 
-// Subquery informasi hunian keluarga
+if ($q_status !== '') {
+    $where .= " AND c.ref_nama = ? ";
+    $params[] = $q_status;
+    $types .= "s";
+}
+
+// Subquery informasi hunian + status keluarga (persis warga.php, format Gg. dibiarkan pakai spasi)
 $subquery_keluarga = "
-    SELECT c.warga_id, d.rumah_nomor_tampil, d.rumah_nomor,
+    SELECT c.warga_id, c.warga_nama,
+    CASE WHEN c.ref_id_hubungan_keluarga=49 THEN CONCAT(c.warga_hubungan_keluarga,' (KK : ',a.warga_nama,')')
+    WHEN a.ref_id_hubungan_keluarga<>49 THEN CONCAT(h.ref_nama,' (KK : ',a.warga_nama,')')
+    ELSE '' END AS status_keluarga, a.warga_nama AS nama_kk, c.warga_parent,
+    d.rumah_nomor_tampil, d.rumah_nomor,
     IF(e.ref_id=20, e.ref_nama, CONCAT('Gg. ', e.ref_nama)) AS gang_tampil, e.ref_nama AS gang
     FROM warga a
+    JOIN referensi g ON g.ref_id=a.ref_id_hubungan_keluarga AND g.ref_kategori='hubungan_keluarga'
     JOIN warga c ON c.warga_parent = a.warga_id
+    JOIN referensi h ON h.ref_id=c.ref_id_hubungan_keluarga AND h.ref_kategori='hubungan_keluarga'
     JOIN warga_rumah f ON a.warga_id = f.warga_id AND f.is_aktif = 1
     JOIN rumah d ON d.rumah_id = f.rumah_id AND d.is_aktif = 1
     JOIN referensi e ON e.ref_id = d.ref_id_gang AND e.ref_kategori = 'gang'
 ";
 
+// Hitung total hasil (default kosong: skip query sampai ada filter)
+$total = 0;
+$pages = 0;
+$result = null;
+
+if ($has_filter) {
 // Hitung total hasil
 $count_sql = "
     SELECT COUNT(*) AS total
@@ -81,10 +103,12 @@ mysqli_stmt_execute($stmt_count);
 $total = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_count))['total'] ?? 0;
 $pages = ceil($total / $limit);
 
-// Ambil data direktori bersih (Clean Table)
+// Ambil data direktori bersih (Clean Table) + Status Keluarga persis warga.php
 $data_sql = "
     SELECT a.warga_id, a.warga_nama,
+    IF(h.warga_id IS NULL, g.ref_nama, h.status_keluarga) AS hubungan_keluarga,
     IF(h.warga_id IS NULL, d.rumah_nomor_tampil, h.rumah_nomor_tampil) AS rumah_nomor_tampil,
+    IF(h.warga_id IS NULL, d.rumah_nomor, h.rumah_nomor) AS rumah_nomor,
     IF(h.warga_id IS NULL, IF(e.ref_id=20, e.ref_nama, CONCAT('Gg. ', e.ref_nama)), h.gang_tampil) AS gang_tampil,
     IFNULL(c.ref_nama, 'Menetap di WP') AS status_domisili
     FROM warga a
@@ -94,8 +118,9 @@ $data_sql = "
     LEFT JOIN warga_rumah f ON a.warga_id = f.warga_id AND f.is_aktif = 1
     LEFT JOIN rumah d ON d.rumah_id = f.rumah_id
     LEFT JOIN referensi e ON e.ref_id = d.ref_id_gang AND e.ref_kategori = 'gang'
+    LEFT JOIN referensi g ON g.ref_id = a.ref_id_hubungan_keluarga AND g.ref_kategori = 'hubungan_keluarga'
     WHERE 1=1 $where
-    ORDER BY CAST(IFNULL(IF(h.warga_id IS NULL, d.rumah_nomor_tampil, h.rumah_nomor_tampil), 999) AS UNSIGNED) ASC, a.warga_nama ASC
+    ORDER BY rumah_nomor, IF(h.warga_parent IS NULL, a.warga_id, h.warga_parent), g.ref_id, hubungan_keluarga, a.warga_nama ASC
     LIMIT ?, ?
 ";
 
@@ -105,6 +130,7 @@ $params_data = array_merge($params, [$start, $limit]);
 mysqli_stmt_bind_param($stmt_data, $types_data, ...$params_data);
 mysqli_stmt_execute($stmt_data);
 $result = mysqli_stmt_get_result($stmt_data);
+}
 ?>
 
 <?php include '../../views/header.php'; ?>
@@ -129,14 +155,14 @@ $result = mysqli_stmt_get_result($stmt_data);
         </div>
         <div class="card-body">
             <form method="get" class="row g-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                     <label class="form-label small fw-bold text-uppercase text-muted">Nama Warga</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0"><i class="bi bi-person"></i></span>
                         <input type="text" name="q_nama" class="form-control border-start-0" placeholder="Ketik nama warga..." value="<?= e($q_nama) ?>">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label small fw-bold text-uppercase text-muted">Nomor Rumah</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0"><i class="bi bi-house-door"></i></span>
@@ -153,6 +179,16 @@ $result = mysqli_stmt_get_result($stmt_data);
                         ?>
                             <option value="<?= e($g['ref_nama']) ?>" <?= $q_gang === $g['ref_nama'] ? 'selected' : '' ?>><?= e($g['ref_nama']) ?></option>
                         <?php endwhile; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-uppercase text-muted">Status Domisili</label>
+                    <select name="status" class="form-select">
+                        <option value="">Semua Status</option>
+                        <option value="Menetap di WP" <?= $q_status === 'Menetap di WP' ? 'selected' : '' ?>>Menetap di WP</option>
+                        <option value="Pindah dari WP" <?= $q_status === 'Pindah dari WP' ? 'selected' : '' ?>>Pindah dari WP</option>
+                        <option value="Meninggal Dunia" <?= $q_status === 'Meninggal Dunia' ? 'selected' : '' ?>>Meninggal Dunia</option>
+                        <option value="Tidak Tinggal di WP" <?= $q_status === 'Tidak Tinggal di WP' ? 'selected' : '' ?>>Tidak Tinggal di WP</option>
                     </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end gap-2">
@@ -175,13 +211,21 @@ $result = mysqli_stmt_get_result($stmt_data);
                         <tr>
                             <th class="text-center" style="width: 60px;">No.</th>
                             <th>Nama Warga</th>
+                            <th>Status Keluarga</th>
                             <th class="text-center" style="width: 160px;">Nomor Rumah</th>
                             <th>Nama Gang / Jalan</th>
                             <th class="text-center" style="width: 180px;">Status Tinggal</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if ($total > 0): ?>
+                        <?php if (!$has_filter): ?>
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-funnel fs-1 d-block mb-2 text-muted opacity-50"></i>
+                                    Gunakan filter lalu klik Cari untuk menampilkan data.
+                                </td>
+                            </tr>
+                        <?php elseif ($total > 0): ?>
                             <?php 
                             $no = $start + 1; 
                             while ($row = mysqli_fetch_assoc($result)) : 
@@ -199,6 +243,7 @@ $result = mysqli_stmt_get_result($stmt_data);
                                     <td>
                                         <div class="fw-bold text-dark"><?= e($row['warga_nama']) ?></div>
                                     </td>
+                                    <td class="small"><?= e($row['hubungan_keluarga'] ?? '') ?></td>
                                     <td class="text-center">
                                         <span class="badge bg-light text-dark border px-3 py-2 fw-bold">
                                             <i class="bi bi-house-door me-1 text-primary"></i> <?= $no_rumah_str ?>
@@ -216,7 +261,7 @@ $result = mysqli_stmt_get_result($stmt_data);
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">
+                                <td colspan="6" class="text-center py-5 text-muted">
                                     <i class="bi bi-search fs-1 d-block mb-2 text-muted opacity-50"></i>
                                     Tidak ada data warga yang cocok dengan kriteria pencarian Anda.
                                 </td>
@@ -233,18 +278,18 @@ $result = mysqli_stmt_get_result($stmt_data);
             <nav aria-label="Page navigation">
                 <ul class="pagination pagination-sm justify-content-center mb-0">
                     <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
-                        <a class="page-link px-3" href="?page=<?= $page - 1 ?>&q_nama=<?= urlencode($q_nama) ?>&q_rumah=<?= urlencode($q_rumah) ?>&gang=<?= urlencode($q_gang) ?>">Prev</a>
+                        <a class="page-link px-3" href="?page=<?= $page - 1 ?>&q_nama=<?= urlencode($q_nama) ?>&q_rumah=<?= urlencode($q_rumah) ?>&gang=<?= urlencode($q_gang) ?>&status=<?= urlencode($q_status) ?>">Prev</a>
                     </li>
                     <?php
                     $start_p = max(1, $page - 2);
                     $end_p = min($pages, $page + 2);
                     for ($i = $start_p; $i <= $end_p; $i++): ?>
                         <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-                            <a class="page-link px-3" href="?page=<?= $i ?>&q_nama=<?= urlencode($q_nama) ?>&q_rumah=<?= urlencode($q_rumah) ?>&gang=<?= urlencode($q_gang) ?>"><?= $i ?></a>
+                            <a class="page-link px-3" href="?page=<?= $i ?>&q_nama=<?= urlencode($q_nama) ?>&q_rumah=<?= urlencode($q_rumah) ?>&gang=<?= urlencode($q_gang) ?>&status=<?= urlencode($q_status) ?>"><?= $i ?></a>
                         </li>
                     <?php endfor; ?>
                     <li class="page-item <?= $page >= $pages ? 'disabled' : '' ?>">
-                        <a class="page-link px-3" href="?page=<?= $page + 1 ?>&q_nama=<?= urlencode($q_nama) ?>&q_rumah=<?= urlencode($q_rumah) ?>&gang=<?= urlencode($q_gang) ?>">Next</a>
+                        <a class="page-link px-3" href="?page=<?= $page + 1 ?>&q_nama=<?= urlencode($q_nama) ?>&q_rumah=<?= urlencode($q_rumah) ?>&gang=<?= urlencode($q_gang) ?>&status=<?= urlencode($q_status) ?>">Next</a>
                     </li>
                 </ul>
             </nav>
