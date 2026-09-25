@@ -4,7 +4,7 @@
 
 ## Status
 
-Belum ada tugas aktif.
+Selesai 2026-09-25: layout 8 form (rumahwarga, rumah, pemilik, koordinator tambah/edit) disamakan ke warga_tambah.php.
 
 ## Sedang dikerjakan
 

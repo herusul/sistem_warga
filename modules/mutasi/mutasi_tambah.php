@@ -64,31 +64,75 @@ if (isset($_POST['simpan'])) {
 
 <?php include '../../views/header.php'; ?>
 <?php include '../../views/sidebar.php'; ?>
-<div class="container mt-4">
-    <h4>➕ Tambah Mutasi untuk <?= e($warga['warga_nama']) ?></h4>
-    
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h4 mb-0 text-gray-800 fw-bold"><i class="bi bi-arrow-left-right me-2"></i>Tambah Mutasi untuk <?= e($warga['warga_nama']) ?></h1>
+        <a href="mutasi_detail.php?id=<?= encrypt_id($warga_id) ?>" class="btn btn-sm btn-outline-secondary px-3"><i class="bi bi-arrow-left me-1"></i> Batal</a>
+    </div>
+
     <?php if (isset($error)) : ?>
-        <div class="alert alert-danger">❌ <?= e($error) ?></div>
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <?= e($error) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php endif; ?>
 
-    <form method="post">
+    <form id="formTambahMutasi" method="post">
         <?= csrf_input() ?>
-        <label>Status Domisili</label>
-        <select name="ref_id_status_aktif" class="form-select mb-2" required>
-            <option value="">- Pilih Status -</option>
-            <?php while ($s = mysqli_fetch_assoc($status_query)) : ?>
-                <option value="<?= e($s['ref_id']) ?>"><?= e($s['ref_nama']) ?></option>
-            <?php endwhile; ?>
-        </select>
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 fw-bold text-primary"><i class="bi bi-geo-alt me-2"></i>Status Domisili</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Status Domisili <span class="text-danger">*</span></label>
+                                <select name="ref_id_status_aktif" class="form-select" required>
+                                    <option value="">- Pilih Status -</option>
+                                    <?php while ($s = mysqli_fetch_assoc($status_query)) : ?>
+                                        <option value="<?= e($s['ref_id']) ?>"><?= e($s['ref_nama']) ?></option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Tanggal Status</label>
+                                <input type="date" name="warga_mutasi_tanggal" class="form-control">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold">Keterangan</label>
+                                <textarea name="warga_mutasi_keterangan" class="form-control" rows="3" placeholder="Keterangan tambahan"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <label>Tanggal Status</label>
-        <input type="date" name="warga_mutasi_tanggal" class="form-control mb-2" >
-
-        <label>Keterangan</label>
-        <textarea name="warga_mutasi_keterangan" class="form-control mb-3" rows="3" placeholder="Keterangan tambahan"></textarea>
-
-        <button type="submit" name="simpan" class="btn btn-primary">💾 Simpan</button>
-        <a href="mutasi_detail.php?id=<?= encrypt_id($warga_id) ?>" class="btn btn-secondary">❌ Batal</a>
+                <div class="d-grid gap-2 mb-5">
+                    <button type="submit" name="simpan" id="btnSimpan" class="btn btn-primary py-3 fw-bold"><i class="bi bi-save me-2"></i> SIMPAN DATA MUTASI</button>
+                    <a href="mutasi_detail.php?id=<?= encrypt_id($warga_id) ?>" class="btn btn-light py-2">Batal</a>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Prevent double submission
+    const form = document.getElementById('formTambahMutasi');
+    const btnSimpan = document.getElementById('btnSimpan');
+
+    form.addEventListener('submit', function() {
+        btnSimpan.disabled = true;
+        btnSimpan.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Menyimpan...';
+
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'simpan';
+        hiddenInput.value = '1';
+        form.appendChild(hiddenInput);
+    });
+});
+</script>
 <?php include '../../views/footer.php'; ?>

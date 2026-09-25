@@ -144,8 +144,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
 <?php include '../../views/header.php'; ?>
 <?php include '../../views/sidebar.php'; ?>
 
-<div class="container mt-4">
-    <h4>✏️ Edit Data Warga</h4>
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h4 mb-0 text-gray-800 fw-bold"><i class="bi bi-pencil-square me-2"></i>Edit Data Warga</h1>
+        <a href="warga.php" class="btn btn-sm btn-outline-secondary px-3"><i class="bi bi-arrow-left me-1"></i> Batal</a>
+    </div>
 
     <?php if (isset($error)) : ?>
         <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
@@ -157,118 +160,190 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
     <form id="formEditWarga" method="post" enctype="multipart/form-data">
         <?= csrf_input() ?>
         <div class="row">
-            <div class="col-md-9">
-				<p class="text-primary"><label><strong>1. Nama Lengkap</strong></label></p>
-				<input type="text" name="warga_nama" class="form-control mb-2" value="<?= e($row['warga_nama']) ?>" required>
-				<p class="text-primary"><label><strong>2. Nama Lengkap dengan Gelar</strong></label></p>
-				<input type="text" name="warga_nama_gelar" class="form-control mb-2" value="<?= e($row['warga_nama_gelar']) ?>">
-				<p class="text-primary"><label><strong>3. NIK</strong></label></p>
-				<input type="text" name="warga_nik" class="form-control mb-2" value="<?= e($row['warga_nik']) ?>">
-				<p class="text-primary"><label><strong>4. Nomor KK</strong></label></p>
-				<input type="text" name="warga_nomor_kk" class="form-control mb-2" value="<?= e($row['warga_nomor_kk']) ?>">
-				<p class="text-primary"><label><strong>5. Kewarganegaraan</strong></label></p>
-				<input type="text" name="warga_negara" class="form-control mb-2" value="<?= e($row['warga_negara']) ?>">
-				<p class="text-primary"><label><strong>6. Nomor HP</strong></label></p>
-				<input type="text" name="warga_no_hp" class="form-control mb-2" value="<?= e($row['warga_no_hp']) ?>">
-				<p class="text-primary"><label><strong>7. Email</strong></label></p>
-				<input type="email" name="warga_email" class="form-control mb-2" value="<?= e($row['warga_email']) ?>">
-				<p class="text-primary"><label><strong>8. Tempat Lahir</strong></label></p>
-				<input type="text" name="warga_tempat_lahir" class="form-control mb-2" value="<?= e($row['warga_tempat_lahir']) ?>">
-				<p class="text-primary"><label><strong>9. Tanggal Lahir</strong></label></p>
-				<input type="date" name="warga_tgl_lahir" class="form-control mb-2" value="<?= e($row['warga_tgl_lahir']) ?>">
-				<p class="text-primary"><label><strong>10. Agama</strong></label></p>
-				<select name="ref_id_agama" class="form-control mb-2">
-					<option value="">- Pilih Agama -</option>
-					<?php while ($a = mysqli_fetch_assoc($agama_query)) : ?>
-						<option value="<?= e($a['ref_id']) ?>" <?= $a['ref_id'] == $row['ref_id_agama'] ? 'selected' : '' ?>><?= e($a['ref_nama']) ?></option>
-					<?php endwhile; ?>
-				</select>
-				<p class="text-primary"><label><strong>11. Jenis Kelamin (*)</strong></label></p>
-				<select name="ref_id_jk" class="form-control mb-2" required>
-					<option value="">- Pilih Jenis Kelamin -</option>
-					<?php while ($j = mysqli_fetch_assoc($jk_query)) : ?>
-						<option value="<?= e($j['ref_id']) ?>" <?= $j['ref_id'] == $row['ref_id_jenis_kelamin'] ? 'selected' : '' ?>><?= e($j['ref_nama']) ?></option>
-					<?php endwhile; ?>
-				</select>
-				<p class="text-primary"><label><strong>12. Golongan Darah</strong></label></p>
-				<select name="ref_id_gd" class="form-control mb-2">
-					<option value="">- Pilih Golongan Darah -</option>
-					<?php while ($g = mysqli_fetch_assoc($gd_query)) : ?>
-						<option value="<?= e($g['ref_id']) ?>" <?= $g['ref_id'] == $row['ref_id_golongan_darah'] ? 'selected' : '' ?>><?= e($g['ref_nama']) ?></option>
-					<?php endwhile; ?>
-				</select>
-				<p class="text-primary"><label><strong>13. Pendidikan</strong></label></p>
-				<select name="ref_id_pdk" class="form-control mb-2">
-					<option value="">- Pilih Pendidikan -</option>
-					<?php while ($p = mysqli_fetch_assoc($pdk_query)) : ?>
-						<option value="<?= e($p['ref_id']) ?>" <?= $p['ref_id'] == $row['ref_id_pendidikan'] ? 'selected' : '' ?>><?= e($p['ref_nama']) ?></option>
-					<?php endwhile; ?>
-				</select>
-				<p class="text-primary"><label><strong>14. Pekerjaan</strong></label></p>
-				<select name="ref_id_pkj" class="form-control mb-2">
-					<option value="">- Pilih Pekerjaan -</option>
-					<?php while ($pk = mysqli_fetch_assoc($pkj_query)) : ?>
-						<option value="<?= e($pk['ref_id']) ?>" <?= $pk['ref_id'] == $row['ref_id_pekerjaan'] ? 'selected' : '' ?>><?= e($pk['ref_nama']) ?></option>
-					<?php endwhile; ?>
-				</select>
-				<input type="text" name="warga_pekerjaan" class="form-control mb-2" placeholder="Diisi jika pekerjaan dipilih Lainnya (opsional)" value="<?= e($row['warga_pekerjaan']) ?>">
-				<p class="text-primary"><label><strong>15. Status Perkawinan</strong></label></p>
-				<select name="ref_id_kwn" class="form-control mb-2">
-					<option value="">- Pilih Status Kawin -</option>
-					<?php while ($k = mysqli_fetch_assoc($kwn_query)) : ?>
-						<option value="<?= e($k['ref_id']) ?>" <?= $k['ref_id'] == $row['ref_id_status_kawin'] ? 'selected' : '' ?>><?= e($k['ref_nama']) ?></option>
-					<?php endwhile; ?>
-				</select>
-				<p class="text-primary"><label><strong>16. Status Hubungan Dalam Keluarga (SHDK) (*)</strong></label></p>
-				<select name="ref_id_klg" id="shdk" class="form-control mb-2" required>
-					<option value="">- Pilih SHDK -</option>
-					<?php while ($h = mysqli_fetch_assoc($klg_query)) : ?>
-						<option value="<?= e($h['ref_id']) ?>" <?= $h['ref_id'] == $row['ref_id_hubungan_keluarga'] ? 'selected' : '' ?>><?= e($h['ref_nama']) ?></option>
-					<?php endwhile; ?>
-				</select>
-				<input type="text" name="warga_hubungan_keluarga" class="form-control mb-2" placeholder="Diisi ketika status hubungan dalam keluarga dipilih Lainnya (opsional)" value="<?= e($row['warga_hubungan_keluarga']) ?>">
+            <!-- Left Column: Basic Info -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 fw-bold text-primary"><i class="bi bi-person-lines-fill me-2"></i>Identitas Pribadi</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-7">
+                                <label class="form-label small fw-bold">Nama Lengkap (Sesuai KTP) <span class="text-danger">*</span></label>
+                                <input type="text" name="warga_nama" class="form-control" value="<?= e($row['warga_nama']) ?>" required>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label small fw-bold">Gelar / Nama Lengkap (Opsional)</label>
+                                <input type="text" name="warga_nama_gelar" class="form-control" value="<?= e($row['warga_nama_gelar']) ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">NIK (16 Digit)</label>
+                                <input type="text" name="warga_nik" class="form-control" value="<?= e($row['warga_nik']) ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Nomor KK</label>
+                                <input type="text" name="warga_nomor_kk" class="form-control" value="<?= e($row['warga_nomor_kk']) ?>">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Tempat Lahir</label>
+                                <input type="text" name="warga_tempat_lahir" class="form-control" value="<?= e($row['warga_tempat_lahir']) ?>">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Tanggal Lahir</label>
+                                <input type="date" name="warga_tgl_lahir" class="form-control" value="<?= e($row['warga_tgl_lahir']) ?>">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Jenis Kelamin <span class="text-danger">*</span></label>
+                                <select name="ref_id_jk" class="form-select" required>
+                                    <option value="">- Pilih -</option>
+                                    <?php while ($j = mysqli_fetch_assoc($jk_query)) : ?>
+                                        <option value="<?= e($j['ref_id']) ?>" <?= $j['ref_id'] == $row['ref_id_jenis_kelamin'] ? 'selected' : '' ?>><?= e($j['ref_nama']) ?></option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Agama</label>
+                                <select name="ref_id_agama" class="form-select">
+                                    <option value="">- Pilih -</option>
+                                    <?php while ($a = mysqli_fetch_assoc($agama_query)) : ?>
+                                        <option value="<?= e($a['ref_id']) ?>" <?= $a['ref_id'] == $row['ref_id_agama'] ? 'selected' : '' ?>><?= e($a['ref_nama']) ?></option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Golongan Darah</label>
+                                <select name="ref_id_gd" class="form-select">
+                                    <option value="">- Pilih -</option>
+                                    <?php while ($g = mysqli_fetch_assoc($gd_query)) : ?>
+                                        <option value="<?= e($g['ref_id']) ?>" <?= $g['ref_id'] == $row['ref_id_golongan_darah'] ? 'selected' : '' ?>><?= e($g['ref_nama']) ?></option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Kewarganegaraan</label>
+                                <input type="text" name="warga_negara" class="form-control" value="<?= e($row['warga_negara']) ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Nomor HP/WA</label>
+                                <input type="text" name="warga_no_hp" class="form-control" value="<?= e($row['warga_no_hp']) ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Email</label>
+                                <input type="email" name="warga_email" class="form-control" value="<?= e($row['warga_email']) ?>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-				<div id="kk-group">
-					<p class="text-primary"><label><strong>17. Nama Kepala Keluarga</strong></label></p>
-					<select name="kk_id" id="kk_id" class="form-control mb-2">
-						<option value="">- Pilih Nama KK -</option>
-						<?php while ($kk = mysqli_fetch_assoc($kk_query)) : ?>
-							<option value="<?= e($kk['warga_id']) ?>" <?= $kk['warga_id'] == $row['warga_parent'] ? 'selected' : '' ?>><?= e($kk['nama']) ?></option>
-						<?php endwhile; ?>
-					</select>
-				</div>
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 fw-bold text-primary"><i class="bi bi-briefcase me-2"></i>Kependudukan & Pekerjaan</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Pendidikan Terakhir</label>
+                                <select name="ref_id_pdk" class="form-select">
+                                    <option value="">- Pilih -</option>
+                                    <?php while ($p = mysqli_fetch_assoc($pdk_query)) : ?>
+                                        <option value="<?= e($p['ref_id']) ?>" <?= $p['ref_id'] == $row['ref_id_pendidikan'] ? 'selected' : '' ?>><?= e($p['ref_nama']) ?></option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Pekerjaan Utama</label>
+                                <select name="ref_id_pkj" class="form-select mb-2">
+                                    <option value="">- Pilih -</option>
+                                    <?php while ($pk = mysqli_fetch_assoc($pkj_query)) : ?>
+                                        <option value="<?= e($pk['ref_id']) ?>" <?= $pk['ref_id'] == $row['ref_id_pekerjaan'] ? 'selected' : '' ?>><?= e($pk['ref_nama']) ?></option>
+                                    <?php endwhile; ?>
+                                </select>
+                                <input type="text" name="warga_pekerjaan" class="form-control" placeholder="Sebutkan jika pilih 'Lainnya'" value="<?= e($row['warga_pekerjaan']) ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Status Perkawinan</label>
+                                <select name="ref_id_kwn" class="form-select">
+                                    <option value="">- Pilih -</option>
+                                    <?php while ($k = mysqli_fetch_assoc($kwn_query)) : ?>
+                                        <option value="<?= e($k['ref_id']) ?>" <?= $k['ref_id'] == $row['ref_id_status_kawin'] ? 'selected' : '' ?>><?= e($k['ref_nama']) ?></option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-				<div class="col-md-12">
-					<p class="text-primary"><label><strong>Upload Foto (jpg/png, abaikan jika tidak diganti)</strong></label></p>
-					<input type="file" name="warga_foto" class="form-control mb-2">
-					<div class="row mb-2">
-						<div class="col-md-6">
-							<p class="text-primary"><label><strong>Upload KTP (PDF)</strong></label></p>
-							<input type="file" name="warga_dokumen_ktp" class="form-control mb-2">
-						</div>
-						<div class="col-md-6">
-							<p class="text-primary"><label><strong>Apakah KTP WP ?</strong></label></p>
-							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="radio" name="is_ktp_wp" value="1" id="ya" <?= $row['is_ktp_wp'] == 1 ? 'checked' : '' ?>>
-								<label class="form-check-label" for="ya">Ya</label>
-							</div>
-							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="radio" name="is_ktp_wp" value="0" id="tidak" <?= $row['is_ktp_wp'] == 0 ? 'checked' : '' ?>>
-								<label class="form-check-label" for="tidak">Tidak</label>
-							</div>
-							<div class="form-check form-check-inline">
-								<input class="form-check-input" type="radio" name="is_ktp_wp" value="2" id="belum" <?=$row['is_ktp_wp'] == 2 ? 'checked' : '' ?>>
-								<label class="form-check-label" for="belum">Belum ber-KTP</label>
-							</div>							
-						</div>
-					</div>
-					<p class="text-primary"><label><strong>Upload KK (PDF)</strong></label></p>
-					<input type="file" name="warga_dokumen_kk" class="form-control mb-2">
-				</div>	
-			</div>
+            <!-- Right Column: Family & Files -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 fw-bold text-primary"><i class="bi bi-people me-2"></i>Status Keluarga</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Status Hubungan (SHDK) <span class="text-danger">*</span></label>
+                            <select name="ref_id_klg" id="shdk" class="form-select" required>
+                                <option value="">- Pilih -</option>
+                                <?php while ($h = mysqli_fetch_assoc($klg_query)) : ?>
+                                    <option value="<?= e($h['ref_id']) ?>" <?= $h['ref_id'] == $row['ref_id_hubungan_keluarga'] ? 'selected' : '' ?>><?= e($h['ref_nama']) ?></option>
+                                <?php endwhile; ?>
+                            </select>
+                            <input type="text" name="warga_hubungan_keluarga" class="form-control mt-2" placeholder="SHDK Lainnya..." value="<?= e($row['warga_hubungan_keluarga']) ?>">
+                        </div>
+                        <div id="kk-group" class="mb-0">
+                            <label class="form-label small fw-bold">Nama Kepala Keluarga</label>
+                            <select name="kk_id" id="kk_id" class="form-select">
+                                <option value="">- Pilih Nama KK -</option>
+                                <?php while ($kk = mysqli_fetch_assoc($kk_query)) : ?>
+                                    <option value="<?= e($kk['warga_id']) ?>" <?= $kk['warga_id'] == $row['warga_parent'] ? 'selected' : '' ?>><?= e($kk['nama']) ?></option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 fw-bold text-primary"><i class="bi bi-camera me-2"></i>Foto & Dokumen</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Upload Pas Foto <span class="text-muted fw-normal">(abaikan jika tidak diganti)</span></label>
+                            <input type="file" name="warga_foto" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Dokumen KTP (PDF)</label>
+                            <input type="file" name="warga_dokumen_ktp" class="form-control">
+                            <div class="mt-2 small">
+                                <span class="text-muted me-2">KTP WP?</span>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="is_ktp_wp" value="1" id="ya" <?= $row['is_ktp_wp'] == 1 ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="ya">Ya</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="is_ktp_wp" value="0" id="tidak" <?= $row['is_ktp_wp'] == 0 ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="tidak">Tidak</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="is_ktp_wp" value="2" id="belum" <?=$row['is_ktp_wp'] == 2 ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="belum">Belum ber-KTP</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label small fw-bold">Dokumen KK (PDF)</label>
+                            <input type="file" name="warga_dokumen_kk" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mb-5">
+                    <button type="submit" name="simpan" id="btnSimpan" class="btn btn-primary py-3 fw-bold"><i class="bi bi-save me-2"></i> SIMPAN PERUBAHAN</button>
+                    <a href="warga.php" class="btn btn-light py-2">Batal</a>
+                </div>
+            </div>
         </div>
-        <button class="btn btn-primary" name="simpan" id="btnSimpan">💾 Simpan Perubahan</button>
-        <a href="warga.php" class="btn btn-secondary">↩️ Batal</a>
     </form>
 </div>
 

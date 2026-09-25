@@ -2,7 +2,7 @@
 /**
  * API Endpoint: Session Keep-Alive / Heartbeat
  * Digunakan oleh frontend saat pengguna memilih "Perpanjang Sesi".
- * Dilengkapi dengan validasi CSRF Token, status autentikasi, dan pembatasan timeout server-side 180s.
+ * Dilengkapi dengan validasi CSRF Token, status autentikasi, dan pembatasan timeout server-side 300s.
  */
 
 require_once __DIR__ . '/includes/auth.php';
@@ -46,8 +46,8 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
-// 4. Validasi waktu inaktivitas server-side (180 detik)
-$timeout_limit = 180;
+// 4. Validasi waktu inaktivitas server-side (300 detik)
+$timeout_limit = 300;
 $now = time();
 $last_activity = $_SESSION['last_activity'] ?? $now;
 
@@ -59,7 +59,7 @@ if (($now - $last_activity) > $timeout_limit) {
     echo json_encode([
         'status' => 'error',
         'code' => 401,
-        'message' => 'Sesi telah kedaluwarsa karena tidak ada aktivitas selama 3 menit. Silakan login kembali.'
+        'message' => 'Sesi telah kedaluwarsa karena tidak ada aktivitas selama 5 menit. Silakan login kembali.'
     ]);
     exit;
 }

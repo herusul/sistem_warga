@@ -4,7 +4,7 @@
 
 ## Status
 
-Selesai 2026-09-24: pencarian cepat disamakan dengan warga.php.
+Selesai 2026-09-25: layout warga_edit.php disamakan ke warga_tambah.php.
 
 ## Sedang dikerjakan
 

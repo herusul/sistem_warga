@@ -69,55 +69,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include '../../views/header.php'; ?>
 <?php include '../../views/sidebar.php'; ?>
 
-<div class="container mt-4">
-    <h4>➕ Tambah Pemilik Rumah Nomor : <?= e($rumah_info['rumah_nomor']) ?></h4>
-    
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h4 mb-0 text-gray-800 fw-bold"><i class="bi bi-person-plus me-2"></i>Tambah Pemilik Rumah WP <?= e($rumah_info['rumah_nomor']) ?></h1>
+        <a href="pemilik_rumah.php" class="btn btn-sm btn-outline-secondary px-3"><i class="bi bi-arrow-left me-1"></i> Batal</a>
+    </div>
+
     <?php if (isset($error)) : ?>
-        <div class="alert alert-danger"><?= e($error) ?></div>
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <?= e($error) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php endif; ?>
 
-    <form method="post" class="row g-3">
+    <form id="formTambahPemilik" method="post">
         <?= csrf_input() ?>
-        <div class="col-md-6">
-            <label class="form-label font-weight-bold">Opsi 1: Jika Pemilik adalah Warga Terdaftar</label>
-            <select name="warga_id" class="form-select">
-                <option value="">-- Pilih Warga --</option>
-                <?php while ($w = mysqli_fetch_assoc($warga_query)) : ?>
-                    <option value="<?= e($w['warga_id']) ?>"><?= e($w['warga_nama']) ?></option>
-                <?php endwhile; ?>
-            </select>
-        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 fw-bold text-primary"><i class="bi bi-person-badge me-2"></i>Identitas Pemilik</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Opsi 1: Jika Pemilik adalah Warga Terdaftar</label>
+                                <select name="warga_id" class="form-select">
+                                    <option value="">-- Pilih Warga --</option>
+                                    <?php while ($w = mysqli_fetch_assoc($warga_query)) : ?>
+                                        <option value="<?= e($w['warga_id']) ?>"><?= e($w['warga_nama']) ?></option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Opsi 2: Jika Pemilik Bukan Warga (Input Manual)</label>
+                                <input type="text" name="rumah_pemilik_nama" class="form-control" placeholder="Nama Pemilik Luar">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">No. HP Pemilik Luar</label>
+                                <input type="text" name="rumah_pemilik_no_hp" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Alamat Pemilik Luar</label>
+                                <input type="text" name="rumah_pemilik_alamat" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Tanggal Mulai Hak Milik <span class="text-danger">*</span></label>
+                                <input type="date" name="rumah_pemilik_tanggal" class="form-control" required>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label small fw-bold">Keterangan Tambahan</label>
+                                <input type="text" name="rumah_pemilik_keterangan" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="col-md-6">
-            <label class="form-label font-weight-bold">Opsi 2: Jika Pemilik Bukan Warga (Input Manual)</label>
-            <input type="text" name="rumah_pemilik_nama" class="form-control" placeholder="Nama Pemilik Luar">
-        </div>
-
-        <div class="col-md-6">
-            <label class="form-label">No. HP Pemilik Luar</label>
-            <input type="text" name="rumah_pemilik_no_hp" class="form-control">
-        </div>
-
-        <div class="col-md-6">
-            <label class="form-label">Alamat Pemilik Luar</label>
-            <input type="text" name="rumah_pemilik_alamat" class="form-control">
-        </div>
-
-        <div class="col-md-4">
-            <label class="form-label">Tanggal Mulai Hak Milik</label>
-            <input type="date" name="rumah_pemilik_tanggal" class="form-control" required>
-        </div>
-
-        <div class="col-md-8">
-            <label class="form-label">Keterangan Tambahan</label>
-            <input type="text" name="rumah_pemilik_keterangan" class="form-control">
-        </div>
-
-        <div class="col-12 mt-4">
-            <button type="submit" class="btn btn-primary px-4">💾 Simpan Data Pemilik</button>
-            <a href="pemilik_rumah.php" class="btn btn-secondary px-4">❌ Batal</a>
+                <div class="d-grid gap-2 mb-5">
+                    <button type="submit" id="btnSimpan" class="btn btn-primary py-3 fw-bold"><i class="bi bi-save me-2"></i> SIMPAN DATA PEMILIK</button>
+                    <a href="pemilik_rumah.php" class="btn btn-light py-2">Batal</a>
+                </div>
+            </div>
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Prevent double submission
+    const form = document.getElementById('formTambahPemilik');
+    const btnSimpan = document.getElementById('btnSimpan');
+
+    form.addEventListener('submit', function() {
+        btnSimpan.disabled = true;
+        btnSimpan.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Menyimpan...';
+    });
+});
+</script>
 
 <?php include '../../views/footer.php'; ?>

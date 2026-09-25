@@ -65,13 +65,13 @@ function get_login_path() {
 }
 
 /**
- * Memeriksa apakah pengguna sudah login, sesi belum timeout (180s), dan memiliki role yang diizinkan.
+ * Memeriksa apakah pengguna sudah login, sesi belum timeout (300s), dan memiliki role yang diizinkan.
  * Mengembalikan HTTP 401 Unauthorized jika sesi kedaluwarsa.
  * @param array $allowed_roles Daftar role yang diizinkan (opsional)
  */
 function check_auth($allowed_roles = []) {
     $login_url = get_login_path();
-    $timeout_duration = 180; // 3 menit (180 detik)
+    $timeout_duration = 300; // 5 menit (300 detik)
     $now = time();
 
     // 1. Periksa apakah user terautentikasi
@@ -107,7 +107,7 @@ function check_auth($allowed_roles = []) {
                 echo json_encode([
                     'status' => 'error',
                     'code' => 401,
-                    'message' => 'Sesi telah berakhir karena tidak ada aktivitas selama 3 menit. Silakan login kembali.'
+                    'message' => 'Sesi telah berakhir karena tidak ada aktivitas selama 5 menit. Silakan login kembali.'
                 ]);
                 exit;
             }

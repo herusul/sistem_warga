@@ -80,71 +80,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include '../../views/header.php'; ?>
 <?php include '../../views/sidebar.php'; ?>
 
-<div class="container mt-4">
-    <h4>✏️ Edit Data Pemilik Rumah</h4>
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h4 mb-0 text-gray-800 fw-bold"><i class="bi bi-pencil-square me-2"></i>Edit Data Pemilik Rumah</h1>
+        <a href="pemilik_rumah_detail.php?id=<?= encrypt_id($id) ?>" class="btn btn-sm btn-outline-secondary px-3"><i class="bi bi-arrow-left me-1"></i> Batal</a>
+    </div>
 
     <?php if (isset($error)) : ?>
-        <div class="alert alert-danger"><?= e($error) ?></div>
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <?= e($error) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php endif; ?>
 
-    <form method="post" class="row g-3">
+    <form id="formEditPemilik" method="post">
         <?= csrf_input() ?>
         <input type="hidden" name="rumah_id" value="<?= e($rumah_id) ?>">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 fw-bold text-primary"><i class="bi bi-person-badge me-2"></i>Identitas Pemilik</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Warga (pilih jika pemilik adalah warga)</label>
+                                <select name="warga_id" class="form-select">
+                                    <option value="">-- Pilih Warga --</option>
+                                    <?php while ($w = mysqli_fetch_assoc($warga_query)) : ?>
+                                        <option value="<?= e($w['warga_id']) ?>" <?= $data['warga_id'] == $w['warga_id'] ? 'selected' : '' ?>>
+                                            <?= e($w['warga_nama']) ?>
+                                        </option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Nama Pemilik (jika bukan warga)</label>
+                                <input type="text" name="rumah_pemilik_nama" class="form-control" value="<?= e($data['rumah_pemilik_nama']) ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">No. HP Pemilik (jika bukan warga)</label>
+                                <input type="text" name="rumah_pemilik_no_hp" class="form-control" value="<?= e($data['rumah_pemilik_no_hp']) ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Alamat Pemilik (jika bukan warga)</label>
+                                <input type="text" name="rumah_pemilik_alamat" class="form-control" value="<?= e($data['rumah_pemilik_alamat']) ?>">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Tanggal Dimiliki</label>
+                                <input type="date" name="rumah_pemilik_tanggal" class="form-control" value="<?= e($data['rumah_pemilik_tanggal']) ?>">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label small fw-bold">Keterangan</label>
+                                <input type="text" name="rumah_pemilik_keterangan" class="form-control" value="<?= e($data['rumah_pemilik_keterangan']) ?>">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold">Status Data</label><br>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="is_aktif" value="1" class="form-check-input" id="aktif" <?= $data['is_aktif'] == 1 ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="aktif">Aktif</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" name="is_aktif" value="0" class="form-check-input" id="tidak_aktif" <?= is_null($data['is_aktif']) ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="tidak_aktif">Tidak Aktif</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Warga (pilih jika pemilik adalah warga)</label>
-            <select name="warga_id" class="form-select">
-                <option value="">-- Pilih Warga --</option>
-                <?php while ($w = mysqli_fetch_assoc($warga_query)) : ?>
-                    <option value="<?= e($w['warga_id']) ?>" <?= $data['warga_id'] == $w['warga_id'] ? 'selected' : '' ?>>
-                        <?= e($w['warga_nama']) ?>
-                    </option>
-                <?php endwhile; ?>
-            </select>
-        </div>
-
-        <div class="col-md-6">
-            <label class="form-label">Nama Pemilik (jika bukan warga)</label>
-            <input type="text" name="rumah_pemilik_nama" class="form-control" value="<?= e($data['rumah_pemilik_nama']) ?>">
-        </div>
-
-        <div class="col-md-6">
-            <label class="form-label">No. HP Pemilik (jika bukan warga)</label>
-            <input type="text" name="rumah_pemilik_no_hp" class="form-control" value="<?= e($data['rumah_pemilik_no_hp']) ?>">
-        </div>
-
-        <div class="col-md-6">
-            <label class="form-label">Alamat Pemilik (jika bukan warga)</label>
-            <input type="text" name="rumah_pemilik_alamat" class="form-control" value="<?= e($data['rumah_pemilik_alamat']) ?>">
-        </div>
-
-        <div class="col-md-4">
-            <label class="form-label">Tanggal Dimiliki</label>
-            <input type="date" name="rumah_pemilik_tanggal" class="form-control" value="<?= e($data['rumah_pemilik_tanggal']) ?>" >
-        </div>
-
-        <div class="col-md-8">
-            <label class="form-label">Keterangan</label>
-            <input type="text" name="rumah_pemilik_keterangan" class="form-control" value="<?= e($data['rumah_pemilik_keterangan']) ?>">
-        </div>
-
-        <div class="mb-3">
-            <label>Status Data</label><br>
-            <div class="form-check form-check-inline">
-                <input type="radio" name="is_aktif" value="1" class="form-check-input" id="aktif" <?= $data['is_aktif'] == 1 ? 'checked' : '' ?>>
-                <label class="form-check-label" for="aktif">Aktif</label>
+                <div class="d-grid gap-2 mb-5">
+                    <button type="submit" id="btnSimpan" class="btn btn-primary py-3 fw-bold"><i class="bi bi-save me-2"></i> SIMPAN PERUBAHAN</button>
+                    <a href="pemilik_rumah_detail.php?id=<?= encrypt_id($id) ?>" class="btn btn-light py-2">Batal</a>
+                </div>
             </div>
-            <div class="form-check form-check-inline">
-                <input type="radio" name="is_aktif" value="0" class="form-check-input" id="tidak_aktif" <?= is_null($data['is_aktif']) ? 'checked' : '' ?>>
-                <label class="form-check-label" for="tidak_aktif">Tidak Aktif</label>
-            </div>
-        </div>
-
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">💾 Simpan Perubahan</button>
-            <a href="pemilik_rumah_detail.php?id=<?= encrypt_id($id) ?>" class="btn btn-secondary">❌ Batal</a>
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Prevent double submission
+    const form = document.getElementById('formEditPemilik');
+    const btnSimpan = document.getElementById('btnSimpan');
+
+    form.addEventListener('submit', function() {
+        btnSimpan.disabled = true;
+        btnSimpan.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Menyimpan...';
+    });
+});
+</script>
 
 <?php include '../../views/footer.php'; ?>

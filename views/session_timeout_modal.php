@@ -2,7 +2,7 @@
 /**
  * View Component: Session Inactivity Warning Modal & Client Monitor
  * Dijalankan pada setiap halaman terautentikasi (melalui views/footer.php).
- * Menerapkan timer 180 detik (3 menit), peringatan 30 detik sebelum habis,
+ * Menerapkan timer 300 detik (5 menit), peringatan 30 detik sebelum habis,
  * dan pembersihan client storage (OWASP compliance).
  */
 
@@ -56,7 +56,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? '';
 
     // Konfigurasi Parameter Keamanan Sesi
     const CONFIG = {
-        TOTAL_TIMEOUT: 180, // Total sesi inaktif 180 detik (3 menit)
+        TOTAL_TIMEOUT: 300, // Total sesi inaktif 300 detik (5 menit)
         WARNING_TIME: 30,   // Peringatan visual muncul 30 detik sebelum habis
         KEEP_ALIVE_URL: '<?= $base_prefix ?>session_keepalive.php',
         LOGOUT_URL: '<?= $base_prefix ?>logout.php',
@@ -165,7 +165,7 @@ $csrf_token = $_SESSION['csrf_token'] ?? '';
 
         if (inactivityTimer) clearTimeout(inactivityTimer);
 
-        // Timer untuk memicu peringatan modal pada detik ke-150 (30 detik sebelum timeout)
+        // Timer untuk memicu peringatan modal pada detik ke-270 (30 detik sebelum timeout)
         const warnAfterMs = (CONFIG.TOTAL_TIMEOUT - CONFIG.WARNING_TIME) * 1000;
         inactivityTimer = setTimeout(showTimeoutWarning, warnAfterMs);
 

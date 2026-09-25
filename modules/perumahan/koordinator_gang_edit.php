@@ -74,22 +74,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include '../../views/header.php'; ?>
 <?php include '../../views/sidebar.php'; ?>
 
-<div class="container mt-4">
-    <h4>✏️ Edit Koordinator Gang: <?= e($data['nama_gang']) ?></h4>
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h4 mb-0 text-gray-800 fw-bold"><i class="bi bi-pencil-square me-2"></i>Edit Koordinator <?= e($data['nama_gang']) ?></h1>
+        <a href="koordinator_gang_detail.php?id=<?= encrypt_id($ref_id_gang) ?>" class="btn btn-sm btn-outline-secondary px-3"><i class="bi bi-arrow-left me-1"></i> Batal</a>
+    </div>
 
     <?php if (isset($error)) : ?>
-        <div class="alert alert-danger"><?= e($error) ?></div>
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <?= e($error) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php endif; ?>
 
-    <form method="post" class="row g-3">
+    <form id="formEditKoordinator" method="post">
         <?= csrf_input() ?>
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 fw-bold text-primary"><i class="bi bi-person-badge me-2"></i>Data Koordinator</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
         <div class="col-md-6">
-            <label class="form-label">Nama Gang</label>
+            <label class="form-label small fw-bold">Nama Gang</label>
             <input type="text" class="form-control" value="<?= e($data['nama_gang']) ?>" disabled>
         </div>
 
         <div class="col-md-6">
-            <label class="form-label">Nama Warga / Koordinator</label>
+            <label class="form-label small fw-bold">Nama Warga / Koordinator <span class="text-danger">*</span></label>
             <select name="warga_id" class="form-select" required>
                 <option value="">-- Pilih Warga --</option>
                 <?php while ($w = mysqli_fetch_assoc($warga_query)) : ?>
@@ -100,8 +114,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </select>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Status Koordinator</label><br>
+        <div class="col-12">
+            <label class="form-label small fw-bold">Status Koordinator</label><br>
             <div class="form-check form-check-inline">
                 <input type="radio" name="is_aktif" value="1" class="form-check-input" id="aktif" <?= $data['is_aktif'] == 1 ? 'checked' : '' ?>>
                 <label class="form-check-label" for="aktif">Aktif</label>
@@ -113,10 +127,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="col-12">
-            <button class="btn btn-primary">💾 Simpan Perubahan</button>
-            <a href="koordinator_gang_detail.php?id=<?= encrypt_id($ref_id_gang) ?>" class="btn btn-secondary">❌ Batal</a>
+            <div class="d-grid gap-2 mt-2">
+                <button type="submit" id="btnSimpan" class="btn btn-primary py-3 fw-bold"><i class="bi bi-save me-2"></i> SIMPAN PERUBAHAN</button>
+                <a href="koordinator_gang_detail.php?id=<?= encrypt_id($ref_id_gang) ?>" class="btn btn-light py-2">Batal</a>
+            </div>
+        </div>
+                        </div><!-- /.row g-3 -->
+                    </div><!-- /.card-body -->
+                </div><!-- /.card -->
+            </div>
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Prevent double submission
+    const form = document.getElementById('formEditKoordinator');
+    const btnSimpan = document.getElementById('btnSimpan');
+
+    form.addEventListener('submit', function() {
+        btnSimpan.disabled = true;
+        btnSimpan.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Menyimpan...';
+    });
+});
+</script>
 
 <?php include '../../views/footer.php'; ?>

@@ -4,7 +4,7 @@
 
 ## Status
 
-Belum ada tugas aktif.
+Selesai 2026-09-25: timeout sesi 180→300 detik + decision.
 
 ## Sedang dikerjakan
 
@@ -12,6 +12,7 @@ Belum ada tugas aktif.
 
 ## Langkah berikut
 
+- Uji manual: diam 4,5 menit → modal peringatan muncul; diam 5+ menit → redirect login `?timeout=1`. Tombol Perpanjang Sesi + keep-alive 90 detik tetap jalan.
 - Tunggu instruksi user.
 
 ## Blocker

@@ -40,7 +40,7 @@ Sebelum membuat kode, tanyakan ke user:
 - Konvensi data: warga soft-delete (`is_delete NULL/1`), riwayat aktif (`is_aktif 1/NULL`, bukan 0).
 - ID referensi sakral jangan diubah: `34 KK, 49 Lainnya, 50/51 L/P, 161-164 status tinggal, 169-171 status rumah, 20 gang utama`.
 - Upload: foto `jpg/jpeg/png`, dokumen `pdf`, maks 5MB, nama acak ke `assets/uploads/`.
-- Timeout sesi 180 detik (`includes/auth.php`). Jangan ubah tanpa decision.
+- Timeout sesi 300 detik (`includes/auth.php`). Jangan ubah tanpa decision.
 
 ## 2. Struktur Folder Acuan
 
@@ -80,7 +80,13 @@ Pemetaan modul ↔ kode ↔ docs ↔ work:
 - Jika skema berubah, update file `.md` terkait + catat di `docs/CHANGELOG.md` + tulis decision jika perubahan struktural.
 - Tabel `ronda`, `ronda_periode`, `warga_isiform` ada di DB tapi **tidak ada modul kode** — perlakukan sebagai legacy/nonaktif, jangan dipakai fitur baru tanpa decision.
 
-## 5. Checklist Sebelum Selesai Sesi
+## 5. Aturan Git & Database (Wajib Konfirmasi User)
+
+- Dilarang melakukan operasi git (`pull, commit, push, merge, rebase, checkout, reset, stash`, dll.) tanpa konfirmasi eksplisit dari user. Boleh `status, diff, log` (read-only) untuk inspeksi.
+- Dilarang melakukan apapun langsung ke database (query `INSERT/UPDATE/DELETE/ALTER`, migrasi, impor, dsb.) tanpa konfirmasi eksplisit dari user. Boleh membaca skema via `ddl-database/` dan `SELECT` read-only untuk verifikasi bila diperlukan.
+- Setiap aksi git/database yang diusulkan harus menyebut perintah/file yang akan dijalankan dan menunggu persetujuan user dulu.
+
+## 6. Checklist Sebelum Selesai Sesi
 
 - [ ] `work/<modul>/current.md` diupdate?
 - [ ] `work/<modul>/handsoff.md` ditambah entri sesi?

@@ -69,7 +69,7 @@ Catatan inkonsistensi (jangan diubah tanpa diskusi):
 
 ## 6. Auth dan Keamanan
 
-- `includes/auth.php`: `check_auth($allowed_roles=[])`. Tanpa argumen = semua login boleh. Timeout **180 detik** (`last_activity`), respons 401 + redirect `login.php?timeout=1` untuk page biasa, JSON 401 untuk AJAX.
+- `includes/auth.php`: `check_auth($allowed_roles=[])`. Tanpa argumen = semua login boleh. Timeout **300 detik** (`last_activity`), respons 401 + redirect `login.php?timeout=1` untuk page biasa, JSON 401 untuk AJAX.
 - Cookie sesi OWASP: `use_strict_mode`, `use_only_cookies`, `httponly=true`, `samesite=Strict`, `secure` otomatis jika HTTPS.
 - Login pengurus (`login.php`): username + password (`password_hash` / `password_verify`) + captcha (`$_SESSION['captcha_text']`) + CSRF. Berhasil: `session_regenerate_id(true)`.
 - Login warga: tombol Google GIS → `google_auth.php` verifikasi JWT ke `oauth2/tokeninfo`, cek `email_verified`, cocokkan `LOWER(warga_email)` yang `is_delete IS NULL` → session `role=user`, `warga_id` terisi. Gagal: `?error=google_not_registered|google_token_invalid|google_empty_email`. Dev mode bisa simulasi via `dev_google_email` jika `is_local_dev_environment()`.

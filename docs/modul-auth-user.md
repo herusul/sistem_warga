@@ -18,7 +18,7 @@ Dua jalur login yang terpisah: pengurus (username/password di tabel `users`) dan
 - `includes/google_auth_config.php`: `GOOGLE_CLIENT_ID`, helper `is_google_auth_configured()`, `is_local_dev_environment()`.
 - `google_auth.php`: terima credential JWT → verifikasi `oauth2/tokeninfo` → cek `email_verified` → cari `LOWER(warga_email)` aktif → isi session `id, warga_id, role=user, nama, email`. Gagal → redirect `login.php?error=...`.
 - `captcha_image.php`: gambar kode, simpan `$_SESSION['captcha_text']`.
-- `includes/auth.php`: `check_auth()`, timeout 180 detik, cookie OWASP, alias `user/pengguna`.
+- `includes/auth.php`: `check_auth()`, timeout 300 detik, cookie OWASP, alias `user/pengguna`.
 - `modules/user/user.php`: tabel `users` + status `tambah_sukses/edit_sukses/hapus_sukses/hapus_diri_gagal/id_error`.
 
 ## 4. Tabel

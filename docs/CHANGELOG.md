@@ -9,4 +9,6 @@
 | 2026-09-23 | Aset | Tahap kode MVP: 11 file `modules/aset/`, menu sidebar, file migrasi SQL; migrasi tabel di MySQL oleh user | Selesai (kode, menunggu migrasi) |
 | 2026-09-23 | Aset | Perbaikan pengembalian sebagian (rincian baik/rusak/hilang, kolom baru, badge); perlu ALTER sekali di DB user | Selesai (kode, menunggu ALTER) |
 | 2026-09-24 | Warga | `pencarian.php`: tambah kolom Status Keluarga + order grouping KK persis `warga.php`, default kosong sampai Cari, tambah filter Status Domisili | Selesai (kode) |
+| 2026-09-25 | Auth-User | Timeout sesi 180→300 detik (`auth.php`, `session_keepalive.php`, `session_timeout_modal.php`) + decision | Selesai (kode) |
+| 2026-09-25 | Warga/Mutasi/Perumahan | Penyeragaman layout 11 form (warga_edit, mutasi tambah/edit, rumahwarga/rumah/pemilik/koordinator tambah/edit) ke pola `warga_tambah.php`; logika PHP tidak diubah | Selesai (kode) |
 | | | | |
